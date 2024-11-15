@@ -1,0 +1,7 @@
+__pycache__/
+ingestion_flows/*/*.pyc
+ingestion_flows/__pycache__
+ingestion_flows/metmuseum_data
+ingestion_flows/metmuseum_postgres_data
+terraform/*
+!*.tf
