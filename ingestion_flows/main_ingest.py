@@ -48,7 +48,7 @@ DEPARTMENTS_URL = f"{BASE_URL}departments" # list of all valid departments
 #     return df.rename(columns={"displayName": "departmentName"})
 
 
-# @task(log_prints=True)
+@task(log_prints=True)
 def get_objects(mo: MuseumObjects) -> pd.DataFrame:
     """Get all museum object data"""
 
@@ -63,7 +63,7 @@ def get_objects(mo: MuseumObjects) -> pd.DataFrame:
     return object_data_df
 
 
-# @task(log_prints=True)
+@task(log_prints=True)
 def get_departments(md: MuseumDepartments) -> pd.DataFrame:
     """Get all museum department data"""
     print("Inside get_departments function")
@@ -76,7 +76,7 @@ def get_departments(md: MuseumDepartments) -> pd.DataFrame:
     return department_data_df
 
 
-# @task(log_prints=True)
+@task(log_prints=True)
 def ingest_into_postgres(df: pd.DataFrame, engine: Engine, table_name: str) -> None:
     """Create Postgres table and ingest the data"""
 
@@ -93,7 +93,7 @@ def ingest_into_postgres(df: pd.DataFrame, engine: Engine, table_name: str) -> N
     print("Data was ingested.")
 
 
-# @flow()
+@flow()
 def etl_web_to_postgres() -> None:
     """The main ETL function"""
 
