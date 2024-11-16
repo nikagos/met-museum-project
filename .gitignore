@@ -1,3 +1,4 @@
+logs/
 __pycache__/
 ingestion_flows/*/*.pyc
 ingestion_flows/__pycache__
