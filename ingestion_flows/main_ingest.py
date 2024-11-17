@@ -53,6 +53,7 @@ def ingest_into_postgres(df: pd.DataFrame, engine: Engine, table_name: str) -> N
         WHERE table_schema = 'public' AND table_name = '{table_name}'
     );
     """)
+    print(check_table_exists_query)
 
     truncate_table_query = text(f"TRUNCATE TABLE {table_name};")
     
