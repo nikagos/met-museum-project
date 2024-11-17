@@ -46,7 +46,6 @@ def get_departments(md: MuseumDepartments) -> pd.DataFrame:
 def ingest_into_postgres(df: pd.DataFrame, engine: Engine, table_name: str) -> None:
     """Create Postgres table and ingest the data"""
 
-    # Check if table exists before truncating
     check_table_exists_query = text(f"""
     SELECT EXISTS (
         SELECT 1 
@@ -54,15 +53,30 @@ def ingest_into_postgres(df: pd.DataFrame, engine: Engine, table_name: str) -> N
         WHERE table_schema = 'public' AND table_name = '{df.name}'
     );
     """)
+
+    truncate_table_query = text("TRUNCATE TABLE objects;")
     
     results = engine.execute(check_table_exists_query).scalar()
 
-    print(f"Creating {table_name} table in the database.")
-    df.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace', index=False)
-    print(df.head())
-    print("Table created.")
-    df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
-    print("Data was ingested.")
+    # Check if table exists before truncating
+    if results:
+        print(f"Table {table_name}. Truncating first...")
+        engine.execute(truncate_table_query).scalar()
+        df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
+        print("Data was ingested.")
+    else:
+        print(f"Table {table_name} does not exist. Creating it in the database.")
+        df.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace', index=False)
+        print("Table created.")
+        df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
+        print("Data was ingested.")
+
+    # print(f"Creating {table_name} table in the database.")
+    # df.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace', index=False)
+    # print(df.head())
+    # print("Table created.")
+    # df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
+    # print("Data was ingested.")
 
 
 @flow()
