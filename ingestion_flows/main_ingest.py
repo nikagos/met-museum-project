@@ -58,6 +58,7 @@ def ingest_into_postgres(df: pd.DataFrame, engine: Engine, table_name: str) -> N
     
     result = engine.execute(check_table_exists_query).fetchone()
     table_exists = result[0] if result else False
+    print(table_exists)
 
     # Check if table exists before truncating
     if table_exists:
