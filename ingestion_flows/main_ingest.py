@@ -42,10 +42,7 @@ def get_departments(md: MuseumDepartments) -> pd.DataFrame:
     return department_data_df
 
 
-@task(log_prints=True)
-def ingest_into_postgres(df: pd.DataFrame, engine: Engine, table_name: str) -> None:
-    """Create Postgres table and ingest the data"""
-
+def check_if_table_exists(table_name: str) -> bool:
     check_table_exists_query = text(f"""
     SELECT EXISTS (
         SELECT 1 
@@ -55,24 +52,36 @@ def ingest_into_postgres(df: pd.DataFrame, engine: Engine, table_name: str) -> N
     """)
     print(check_table_exists_query)
 
-    truncate_table_query = text(f"TRUNCATE TABLE {table_name};")
+    # Import the metmuseum-postgres-connector built in Prefect as the database engine
+    database_block = SqlAlchemyConnector.load("metmuseum-postgres-connector")
+
+    with database_block.get_connection(begin=False) as engine:
+        result = engine.execute(check_table_exists_query).fetchone()
+        table_exists = result[0] if result else False
+        print(table_exists)
     
-    # result = engine.execute(check_table_exists_query).fetchone()
-    # table_exists = result[0] if result else False
-    # print(table_exists)
+    return table_exists
+
+
+@task(log_prints=True)
+def ingest_into_postgres(df: pd.DataFrame, engine: Engine, table_name: str) -> None:
+    """Create Postgres table and ingest the data"""
+
+    table_exists = check_if_table_exists(table_name)
 
     # Check if table exists before truncating
-    # if not table_exists:
-    print(f"Table {table_name} does not exist. Skipped truncating and creating it in the database.")
-    df.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace', index=False)
-    print("Table created.")
-    df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
-    print("Data was ingested.")
-    # else:
-    #     print(f"Table {table_name}. Truncating first...")
-    #     engine.execute(truncate_table_query)
-    #     df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
-    #     print("Data was ingested.")
+    if not table_exists:
+        print(f"Table {table_name} does not exist. Skipped truncating and creating it in the database.")
+        df.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace', index=False)
+        print("Table created.")
+        df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
+        print("Data was ingested.")
+    else:
+        print(f"Table {table_name}. Truncating first...")
+        truncate_table_query = text(f"TRUNCATE TABLE {table_name};")
+        engine.execute(truncate_table_query)
+        df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
+        print("Data was ingested.")
 
 
     # # Check if the table exists
