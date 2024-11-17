@@ -50,27 +50,27 @@ def ingest_into_postgres(df: pd.DataFrame, engine: Engine, table_name: str) -> N
     SELECT EXISTS (
         SELECT 1 
         FROM information_schema.tables 
-        WHERE table_schema = 'public' AND table_name = '{df.name}'
+        WHERE table_schema = 'public' AND table_name = '{table_name}'
     );
     """)
 
-    truncate_table_query = text("TRUNCATE TABLE objects;")
+    truncate_table_query = text(f"TRUNCATE TABLE {table_name};")
     
-    # result = engine.execute(check_table_exists_query).fetchone()
-    # table_exists = result[0] if result else False
+    result = engine.execute(check_table_exists_query).fetchone()
+    table_exists = result[0] if result else False
 
-    # # Check if table exists before truncating
-    # if table_exists:
-    #     print(f"Table {table_name}. Truncating first...")
-    #     engine.execute(truncate_table_query)
-    #     df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
-    #     print("Data was ingested.")
-    # else:
-    print(f"Table {table_name} does not exist. Skipped truncating and creating it in the database.")
-    df.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace', index=False)
-    print("Table created.")
-    df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
-    print("Data was ingested.")
+    # Check if table exists before truncating
+    if table_exists:
+        print(f"Table {table_name}. Truncating first...")
+        engine.execute(truncate_table_query)
+        df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
+        print("Data was ingested.")
+    else:
+        print(f"Table {table_name} does not exist. Skipped truncating and creating it in the database.")
+        df.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace', index=False)
+        print("Table created.")
+        df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
+        print("Data was ingested.")
 
     # print(f"Creating {table_name} table in the database.")
     # df.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace', index=False)
