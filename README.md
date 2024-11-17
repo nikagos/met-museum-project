@@ -1,1 +1,1 @@
-# met-museum-project
+# The Met Museum data pipeline
