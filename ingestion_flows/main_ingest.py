@@ -6,7 +6,6 @@ from prefect import flow, task
 from prefect_sqlalchemy import SqlAlchemyConnector
 from sqlalchemy.engine import Engine
 from sqlalchemy import text
-from sqlalchemy import create_engine
 
 
 
