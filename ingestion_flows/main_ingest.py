@@ -22,7 +22,7 @@ def get_objects(mo: MuseumObjects) -> pd.DataFrame:
 
     object_ids = mo.get_object_ids()
     # Sample a smaller subset if necessary
-    sample_object_ids = object_ids[:5000]  # Adjust sample size as needed
+    sample_object_ids = object_ids[:8000]  # Adjust sample size as needed
 
     print("Getting all Object data.")
     results = mo.get_object_data(sample_object_ids)
