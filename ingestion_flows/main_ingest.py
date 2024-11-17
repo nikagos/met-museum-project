@@ -62,17 +62,17 @@ def ingest_into_postgres(df: pd.DataFrame, engine: Engine, table_name: str) -> N
     print(table_exists)
 
     # Check if table exists before truncating
-    if not table_exists:
-        print(f"Table {table_name} does not exist. Skipped truncating and creating it in the database.")
-        df.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace', index=False)
-        print("Table created.")
-        df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
-        print("Data was ingested.")
-    else:
-        print(f"Table {table_name}. Truncating first...")
-        engine.execute(truncate_table_query)
-        df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
-        print("Data was ingested.")
+    # if not table_exists:
+    print(f"Table {table_name} does not exist. Skipped truncating and creating it in the database.")
+    df.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace', index=False)
+    print("Table created.")
+    df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
+    print("Data was ingested.")
+    # else:
+    #     print(f"Table {table_name}. Truncating first...")
+    #     engine.execute(truncate_table_query)
+    #     df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
+    #     print("Data was ingested.")
 
 
     # # Check if the table exists
