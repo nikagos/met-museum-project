@@ -43,6 +43,10 @@ def get_departments(md: MuseumDepartments) -> pd.DataFrame:
 
 
 def check_if_table_exists(table_name: str) -> bool:
+    """
+    Function to check if the target table exists. We had to separate this and create and new "engine"
+    because using the existing one in etl_web_to_postgres() was causing some conflict.
+    """
     check_table_exists_query = text(f"""
     SELECT EXISTS (
         SELECT 1 
@@ -58,7 +62,6 @@ def check_if_table_exists(table_name: str) -> bool:
     with database_block.get_connection(begin=False) as engine:
         result = engine.execute(check_table_exists_query).fetchone()
         table_exists = result[0] if result else False
-        print(table_exists)
     
     return table_exists
 
@@ -69,17 +72,17 @@ def ingest_into_postgres(df: pd.DataFrame, engine: Engine, table_name: str) -> N
 
     table_exists = check_if_table_exists(table_name)
 
-    # Check if table exists before truncating
-    if not table_exists:
-        print(f"Table {table_name} does not exist. Skipped truncating and creating it in the database.")
-        df.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace', index=False)
-        print("Table created.")
-        df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
-        print("Data was ingested.")
-    else:
+    # Check if table exists before truncating. If it doesn't, create it
+    if table_exists:
         print(f"Table {table_name}. Truncating first...")
         truncate_table_query = text(f"TRUNCATE TABLE {table_name};")
         engine.execute(truncate_table_query)
+        df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
+        print("Data was ingested.")
+    else:
+        print(f"Table {table_name} does not exist. Skipped truncating and creating it in the database.")
+        df.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace', index=False)
+        print("Table created.")
         df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
         print("Data was ingested.")
 
