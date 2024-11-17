@@ -47,13 +47,13 @@ def ingest_into_postgres(df: pd.DataFrame, engine: Engine, table_name: str) -> N
     """Create Postgres table and ingest the data"""
 
     # Check if table exists before truncating
-    check_table_exists_query = """
+    check_table_exists_query = text(f"""
     SELECT EXISTS (
         SELECT 1 
         FROM information_schema.tables 
         WHERE table_schema = 'public' AND table_name = '{df.name}'
     );
-    """
+    """)
     
     results = engine.execute(check_table_exists_query).scalar()
 
