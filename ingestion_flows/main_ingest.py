@@ -37,7 +37,6 @@ def get_departments(md: MuseumDepartments) -> pd.DataFrame:
     print("Inside get_departments function")
     results = md.fetch_department_data()
     results_filtered = [res for res in results if res is not None]
-    # print(results_filtered)
 
     department_data_df = md.generate_department_data_df(results_filtered)
     print("Finished with get_departments function")
@@ -47,12 +46,6 @@ def get_departments(md: MuseumDepartments) -> pd.DataFrame:
 @task(log_prints=True)
 def ingest_into_postgres(df: pd.DataFrame, engine: Engine, table_name: str) -> None:
     """Create Postgres table and ingest the data"""
-
-    # # Check connection to metmuseum
-    # print("Checking connection...")
-    # result = engine.execute(text("SELECT current_database()")).fetchone()
-    # print(f"Connected to database: {result[0]}")  # Should print "metmuseum"
-
     print(f"Creating {table_name} table in the database.")
     df.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace', index=False)
     print(df.head())
@@ -81,10 +74,6 @@ def etl_web_to_postgres() -> None:
     department_data_df.name = "departments"
     dfs.append(department_data_df)
     
-    # print(object_data_df.head())
-    # print(dfs)
-    # print(department_data_df.head())
-
     # Import the metmuseum-postgres-connector built in Prefect as the database engine
     database_block = SqlAlchemyConnector.load("metmuseum-postgres-connector")
 

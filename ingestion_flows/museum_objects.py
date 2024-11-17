@@ -1,4 +1,4 @@
-import time
+# import time
 import requests
 import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
@@ -39,7 +39,6 @@ class MuseumObjects:
     def fetch_object_data(self, obj_id:int):
         """Fetch object data"""
         object_url = f"{self.objects_url}/{obj_id}"
-        # print(f"Getting data for object url: {object_url}")
         object_response = requests.get(object_url)
 
         if object_response.status_code == 200:
