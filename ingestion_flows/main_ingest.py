@@ -69,7 +69,7 @@ def ingest_into_postgres(df: pd.DataFrame, engine: Engine, table_name: str) -> N
         print("Data was ingested.")
     else:
         print(f"Table {table_name} does not exist. Skipped truncating and creating it in the database.")
-        df.head(n=0).to_sql(name=table_name, con=engine, if_exists='truncate', index=False) # replace
+        df.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace', index=False)
         print("Table created.")
         df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
         print("Data was ingested.")
