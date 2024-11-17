@@ -61,7 +61,7 @@ class MuseumObjects:
         fetch_object_data(3)
         almost simultaneously (up to the thread limit set by max_workers), and store their results in results.
         """
-        with ThreadPoolExecutor(max_workers=20) as executor: # Adjust max_workers as needed
+        with ThreadPoolExecutor(max_workers=100) as executor: # Adjust max_workers as needed
             # start_time = time.time()
             
             results = list(executor.map(self.fetch_object_data, object_ids)) # Substitute object_ids with sample_object_ids for testing
