@@ -45,6 +45,18 @@ def get_departments(md: MuseumDepartments) -> pd.DataFrame:
 @task(log_prints=True)
 def ingest_into_postgres(df: pd.DataFrame, engine: Engine, table_name: str) -> None:
     """Create Postgres table and ingest the data"""
+
+    # Check if table exists before truncating
+    check_table_exists_query = """
+    SELECT EXISTS (
+        SELECT 1 
+        FROM information_schema.tables 
+        WHERE table_schema = 'public' AND table_name = '{df.name}'
+    );
+    """
+    
+    results = engine.execute(check_table_exists_query)
+
     print(f"Creating {table_name} table in the database.")
     df.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace', index=False)
     print(df.head())
