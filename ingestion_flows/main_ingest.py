@@ -55,7 +55,7 @@ def ingest_into_postgres(df: pd.DataFrame, engine: Engine, table_name: str) -> N
     );
     """
     
-    results = engine.execute(check_table_exists_query)
+    results = engine.execute(check_table_exists_query).scalar()
 
     print(f"Creating {table_name} table in the database.")
     df.head(n=0).to_sql(name=table_name, con=engine, if_exists='replace', index=False)
