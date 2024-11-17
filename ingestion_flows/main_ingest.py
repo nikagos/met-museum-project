@@ -58,7 +58,6 @@ def ingest_into_postgres(df: pd.DataFrame, engine: Engine, table_name: str) -> N
     truncate_table_query = text(f"TRUNCATE TABLE {table_name};")
     
     result = engine.execute(check_table_exists_query).fetchone()
-    print(f"Result: {result}")
     table_exists = result[0] if result else False
     print(table_exists)
 
@@ -70,7 +69,7 @@ def ingest_into_postgres(df: pd.DataFrame, engine: Engine, table_name: str) -> N
         print("Data was ingested.")
     else:
         print(f"Table {table_name} does not exist. Skipped truncating and creating it in the database.")
-        df.head(n=0).to_sql(name=table_name, con=engine, index=False) # if_exists='replace', 
+        df.head(n=0).to_sql(name=table_name, con=engine, if_exists='truncate', index=False) # replace
         print("Table created.")
         df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
         print("Data was ingested.")
