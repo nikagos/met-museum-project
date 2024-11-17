@@ -1,0 +1,64 @@
+
+version: 2
+
+models:
+  - name: my_first_dbt_model
+    description: "A starter dbt model"
+    columns:
+      - name: id
+        description: The primary key for this table
+
+  - name: my_second_dbt_model
+    description: "A starter dbt model"
+    columns:
+      - name: id
+        description: The primary key for this table
+
+  - name: departments_base
+    description: Refined version of the original departments table
+    columns:
+      - name: department_id
+        description: The primary key for this table
+        data_tests:
+          - unique
+          - not_null
+  
+  - name: objects_base
+    description: Refined version of the original objects table
+    columns:
+      - name: object_id
+        description: The primary key for this table
+        data_tests:
+          - unique
+          - not_null
+  
+  - name: object_measurements
+    description: Measurements (height, widthm depth) of an object
+    columns:
+      - name: unique_id
+        description: The primary key for this table
+        data_tests:
+          - unique
+          - not_null
+  
+  - name: constituents
+    description: The constituents associated with an object
+    columns:
+      - name: unique_id
+        description: The primary key for this table
+        data_tests:
+          - unique
+          - not_null
+
+
+sources:
+    - name: main
+      description: Raw data from the Met Museum API
+      schema: public  # The schema where the source table exists
+      tables:
+        - name: departments
+          description:
+            All departments of the museum with name and id
+        - name: objects
+          description:
+            All objects of all the departments of the museum

@@ -16,38 +16,6 @@ OBJECTS_URL = f"{BASE_URL}objects" # list of all valid objects
 DEPARTMENTS_URL = f"{BASE_URL}departments" # list of all valid departments
 
 
-# # @task(log_prints=True)
-# def fetch_department_data(md: MuseumDepartments) -> list:
-#     """Fetch object data"""
-#     print("Inside fetch_department_data function")
-#     print(f"Getting data for departments url: {md.departments_url}")
-#     department_response = requests.get(md.departments_url)
-    
-#     if department_response.status_code == 200:
-
-#         # Get all keys from dictionary "department_data"
-#         department_data = department_response.json()
-#         # key "departments" contains all the valid departments that we want to parse
-#         filtered_key = [key for key in department_data if key == "departments"]
-
-#         # Use the .get() method on the data dictionary to retrieve the value associated with the key "departments"
-#         departments_list = department_data.get(filtered_key[0], [])
-#         print("Finished with fetch_department_data function")
-#         return departments_list
-#     else:
-#         return None
-
-
-# # @task(log_prints=True)
-# def generate_department_data_df(results: list) -> pd.DataFrame:
-#     """# Convert list of dictionaries to DataFrame"""
-#     print("Inside generate_department_data_df function")
-#     df = pd.DataFrame(results)
-#     # Rename column
-#     print("Finished with generate_department_data_df function")
-#     return df.rename(columns={"displayName": "departmentName"})
-
-
 @task(log_prints=True)
 def get_objects(mo: MuseumObjects) -> pd.DataFrame:
     """Get all museum object data"""
@@ -96,13 +64,6 @@ def ingest_into_postgres(df: pd.DataFrame, engine: Engine, table_name: str) -> N
 @flow()
 def etl_web_to_postgres() -> None:
     """The main ETL function"""
-
-    # user = "root"
-    # password = "root"
-    # host = "localhost"
-    # port = 5432
-    # db = "metmuseum"
-    # engine = create_engine(f'postgresql://{user}:{password}@{host}:{port}/{db}')
     
     mo = MuseumObjects(OBJECTS_URL)
     md = MuseumDepartments(DEPARTMENTS_URL)
