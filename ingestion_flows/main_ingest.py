@@ -67,9 +67,11 @@ def check_if_table_exists(table_name: str, engine: Engine) -> bool:
 
     # Use the provided engine directly
     with engine.connect() as connection:
-        result = connection.execute(check_table_exists_query).fetchone()
+        result = connection.execute(check_table_exists_query, {'table_name': table_name}).fetchone()
         table_exists = result[0] if result else False
         print(f"Table {table_name} exists: {table_exists}")
+        
+    return table_exists
         
     return table_exists
 
