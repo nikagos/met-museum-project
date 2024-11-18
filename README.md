@@ -4,7 +4,7 @@
 The Metropolitan Museum of Art a.k.a. Met Museum is one of the most popular museums in the world and is based in New York City. They offer an [API](https://metmuseum.github.io/) endpoint that people can use to access and explore their museum exhibition data digitally.
 
 ## Purpose of the project
-In the context of the [Data Engineering Zoomcamp](https://datatalks.club/), which teaches all about building pipelines, I decided to put this knowledge into practice and implement this pipeline. 
+In the context of the [Data Engineering Zoomcamp](https://datatalks.club/), which teaches all about building pipelines, I decided to put this knowledge into practice and implement this pipeline. Note that we are skipping the visualization part of the data lifecycle, as we want to purely focus on the ELT part and not the consumption.
 
 ## Pipeline architecture
 The pipeline utilizes a wide range of tools that are nowdays part of the modern data engineering stach. More specifically:
