@@ -13,6 +13,7 @@ from sqlalchemy import text
 BASE_URL = "https://collectionapi.metmuseum.org/public/collection/v1/"
 OBJECTS_URL = f"{BASE_URL}objects" # list of all valid objects
 DEPARTMENTS_URL = f"{BASE_URL}departments" # list of all valid departments
+OBJECT_COUNT = 500 # Adjust sample size as needed
 
 
 @task(log_prints=True)
@@ -21,7 +22,7 @@ def get_objects(mo: MuseumObjects) -> pd.DataFrame:
 
     object_ids = mo.get_object_ids()
     # Sample a smaller subset if necessary
-    sample_object_ids = object_ids[:500]  # Adjust sample size as needed
+    sample_object_ids = object_ids[:OBJECT_COUNT]
 
     print("Getting all Object data.")
     results = mo.get_object_data(sample_object_ids)
@@ -42,6 +43,7 @@ def get_departments(md: MuseumDepartments) -> pd.DataFrame:
     return department_data_df
 
 
+@task(log_prints=True)
 def check_if_table_exists(table_name: str) -> bool:
     """
     Function to check if the target table exists. We had to separate this and create and new "engine"
@@ -66,15 +68,16 @@ def check_if_table_exists(table_name: str) -> bool:
     return table_exists
 
 
-def truncate_table(table_name: str) -> None:
+@task(log_prints=True)
+def truncate_table(table_name: str, engine: Engine) -> None:
 
-    # Import the metmuseum-postgres-connector built in Prefect as the database engine
-    database_block = SqlAlchemyConnector.load("metmuseum-postgres-connector")
+    # # Import the metmuseum-postgres-connector built in Prefect as the database engine
+    # database_block = SqlAlchemyConnector.load("metmuseum-postgres-connector")
 
-    with database_block.get_connection(begin=False) as engine:
-        print(f"Table {table_name}. Truncating first...")
-        truncate_table_query = text(f"TRUNCATE TABLE {table_name};")
-        engine.execute(truncate_table_query)
+    # with database_block.get_connection(begin=False) as engine:
+        # print(f"Table {table_name}. Truncating first...")
+    truncate_table_query = text(f"TRUNCATE TABLE {table_name};")
+    engine.execute(truncate_table_query)
 
     return None
 
@@ -87,7 +90,7 @@ def ingest_into_postgres(df: pd.DataFrame, engine: Engine, table_name: str) -> N
 
     # Check if table exists before truncating. If it doesn't, create it
     if table_exists:
-        truncate_table(table_name)
+        truncate_table(table_name, engine)
         df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
         print("Data was ingested.")
 
