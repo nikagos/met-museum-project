@@ -23,8 +23,8 @@ The pipeline utilizes a wide range of tools that are nowadays part of the modern
 ## Prerequisites to run the pipeline
 1. Postgres credentials need to be stored in a Prefect Block (Prefect > Blocks > Create > Select "SQLAlchemy Connector")
   * Note that we used the option SyncDriver > "postgresql+psycopg2"
-2. Prefect Server is running (command “prefect server start”)
-3. Docker-compose is running (command  “docker-compose up --build” or “docker-compose up -d”)
+2. Prefect Server is running (run command `prefect server start`)
+3. Docker-compose is running (run command `docker-compose up --build` or `docker-compose up -d`)
 4. Ports 5432 (Postgres), 8080 (pgAdmin), 4200 (Prefect) have been forwarded. I use VS Code for this and the Ports > Forward option available.
 
 ## Run the pipeline
