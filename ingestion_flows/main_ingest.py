@@ -21,7 +21,7 @@ def get_objects(mo: MuseumObjects) -> pd.DataFrame:
 
     object_ids = mo.get_object_ids()
     # Sample a smaller subset if necessary
-    sample_object_ids = object_ids[:5000]  # Adjust sample size as needed
+    sample_object_ids = object_ids[:500]  # Adjust sample size as needed
 
     print("Getting all Object data.")
     results = mo.get_object_data(sample_object_ids)
@@ -66,24 +66,30 @@ def check_if_table_exists(table_name: str) -> bool:
     return table_exists
 
 
+def truncate_table(table_name: str) -> None:
+
+    # Import the metmuseum-postgres-connector built in Prefect as the database engine
+    database_block = SqlAlchemyConnector.load("metmuseum-postgres-connector")
+
+    with database_block.get_connection(begin=False) as engine:
+        print(f"Table {table_name}. Truncating first...")
+        truncate_table_query = text(f"TRUNCATE TABLE {table_name};")
+        engine.execute(truncate_table_query)
+
+    return None
+
+
+
 @task(log_prints=True)
 def ingest_into_postgres(df: pd.DataFrame, engine: Engine, table_name: str) -> None:
     """Create Postgres table and ingest the data"""
-
     table_exists = check_if_table_exists(table_name)
 
     # Check if table exists before truncating. If it doesn't, create it
     if table_exists:
-        # print(f"Table {table_name}. Truncating first...")
-        # truncate_table_query = text(f"TRUNCATE TABLE {table_name};")
-        # engine.execute(truncate_table_query)
-        # df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
-        # print("Data was ingested.")
-            # Begin a transaction explicitly for TRUNCATE
-        with engine.connect() as connection:
-            truncate_table_query = text(f"TRUNCATE TABLE {table_name};")
-            connection.execute(truncate_table_query)
-            print(f"Table {table_name} truncated successfully.")
+        truncate_table(table_name)
+        df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
+        print("Data was ingested.")
 
     else:
         print(f"Table {table_name} does not exist. Skipped truncating and creating it in the database.")
