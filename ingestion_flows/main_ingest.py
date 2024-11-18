@@ -69,18 +69,17 @@ def check_if_table_exists(table_name: str) -> bool:
 
 
 @task(log_prints=True)
-def truncate_table(table_name: str, engine: Engine) -> None:
+def truncate_table(table_name: str) -> None:
 
-    # # Import the metmuseum-postgres-connector built in Prefect as the database engine
-    # database_block = SqlAlchemyConnector.load("metmuseum-postgres-connector")
+    # Import the metmuseum-postgres-connector built in Prefect as the database engine
+    database_block = SqlAlchemyConnector.load("metmuseum-postgres-connector")
 
-    # with database_block.get_connection(begin=False) as engine:
-        # print(f"Table {table_name}. Truncating first...")
-    truncate_table_query = text(f"TRUNCATE TABLE {table_name};")
-    engine.execute(truncate_table_query)
+    with database_block.get_connection(begin=False) as engine:
+        print(f"Table {table_name}. Truncating first...")
+        truncate_table_query = text(f"TRUNCATE TABLE {table_name};")
+        engine.execute(truncate_table_query)
 
     return None
-
 
 
 @task(log_prints=True)
