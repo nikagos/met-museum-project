@@ -6,6 +6,7 @@ from prefect import flow, task
 from prefect_sqlalchemy import SqlAlchemyConnector
 from sqlalchemy.engine import Engine
 from sqlalchemy import text
+from sqlalchemy import create_engine
 
 
 
@@ -17,10 +18,10 @@ OBJECT_COUNT = 500 # Adjust sample size as needed
 
 
 @task(log_prints=True)
-def get_db_engine():
-    """Fetch the engine from Prefect's SqlAlchemyConnector"""
-    database_block = SqlAlchemyConnector.load("metmuseum-postgres-connector")
-    engine = database_block.get_connection()
+def get_db_engine() -> Engine:
+    # Replace with your actual connection string
+    connection_string = "postgresql+psycopg2://username:password@host:port/database"
+    engine = create_engine(connection_string)
     return engine
 
 
