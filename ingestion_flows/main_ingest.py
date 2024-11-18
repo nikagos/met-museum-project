@@ -13,7 +13,7 @@ from sqlalchemy import text
 BASE_URL = "https://collectionapi.metmuseum.org/public/collection/v1/"
 OBJECTS_URL = f"{BASE_URL}objects" # list of all valid objects
 DEPARTMENTS_URL = f"{BASE_URL}departments" # list of all valid departments
-OBJECT_COUNT = 1000 # Adjust sample size as needed
+OBJECT_COUNT = 5000 # Adjust sample size as needed
 
 
 @task(log_prints=True)
