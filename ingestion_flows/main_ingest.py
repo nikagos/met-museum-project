@@ -80,7 +80,7 @@ def ingest_into_postgres(df: pd.DataFrame, engine: Engine, table_name: str) -> N
         # df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
         # print("Data was ingested.")
             # Begin a transaction explicitly for TRUNCATE
-        with engine.begin() as connection:
+        with engine.connect() as connection:
             truncate_table_query = text(f"TRUNCATE TABLE {table_name};")
             connection.execute(truncate_table_query)
             print(f"Table {table_name} truncated successfully.")
