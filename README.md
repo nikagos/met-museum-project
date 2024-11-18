@@ -16,3 +16,4 @@ The pipeline utilizes a wide range of tools that are nowdays part of the modern 
 6. **Prefect** as the job orchestrator
 7. **dbt** for the transformations
 
+<img src="https://github.githubassets.com/images/pipeline_architecture.png" width="100">
