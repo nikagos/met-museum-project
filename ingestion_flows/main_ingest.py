@@ -17,6 +17,14 @@ OBJECT_COUNT = 500 # Adjust sample size as needed
 
 
 @task(log_prints=True)
+def get_db_engine():
+    """Fetch the engine from Prefect's SqlAlchemyConnector"""
+    database_block = SqlAlchemyConnector.load("metmuseum-postgres-connector")
+    engine = database_block.get_connection()
+    return engine
+
+
+@task(log_prints=True)
 def get_objects(mo: MuseumObjects) -> pd.DataFrame:
     """Get all museum object data"""
 
@@ -46,8 +54,7 @@ def get_departments(md: MuseumDepartments) -> pd.DataFrame:
 @task(log_prints=True)
 def check_if_table_exists(table_name: str, engine: Engine) -> bool:
     """
-    Function to check if the target table exists. We had to separate this and create and new "engine"
-    because using the existing one in etl_web_to_postgres() was causing some conflict.
+    Function to check if the target table exists in the database.
     """
     check_table_exists_query = text(f"""
     SELECT EXISTS (
@@ -56,17 +63,14 @@ def check_if_table_exists(table_name: str, engine: Engine) -> bool:
         WHERE table_schema = 'public' AND table_name = '{table_name}'
     );
     """)
-    print(check_table_exists_query)
+    print(f"Checking if table '{table_name}' exists...")
 
-    # # Import the metmuseum-postgres-connector built in Prefect as the database engine
-    # database_block = SqlAlchemyConnector.load("metmuseum-postgres-connector")
-
-    # with database_block.get_connection(begin=False) as engine:
+    # Use the provided engine directly
     with engine.connect() as connection:
         result = connection.execute(check_table_exists_query).fetchone()
         table_exists = result[0] if result else False
-        print(table_exists)
-
+        print(f"Table {table_name} exists: {table_exists}")
+        
     return table_exists
 
 
@@ -76,11 +80,10 @@ def truncate_table(table_name: str, engine: Engine) -> None:
     print(f"Truncating table {table_name}...")
     truncate_table_query = text(f"TRUNCATE TABLE {table_name};")
 
+    # Use the provided engine directly
     with engine.connect() as connection:
         connection.execute(truncate_table_query)
     print(f"Table {table_name} truncated successfully.")
-
-    return None
 
 
 @task(log_prints=True)
@@ -89,6 +92,9 @@ def ingest_into_postgres(df: pd.DataFrame, engine: Engine, table_name: str) -> N
 
     # # Check if table exists before truncating. If it doesn't, create it
     # with engine.begin() as connection:
+
+    # Create the engine from the connector
+    engine = get_db_engine()
 
     table_exists = check_if_table_exists(table_name, engine)
 
@@ -151,9 +157,8 @@ def etl_web_to_postgres() -> None:
     department_data_df.name = "departments"
     dfs.append(department_data_df)
     
-    # Import the metmuseum-postgres-connector built in Prefect as the database engine
-    database_block = SqlAlchemyConnector.load("metmuseum-postgres-connector")
-    engine = database_block.get_connection(begin=False)
+    # Fetch the engine using the database connector
+    engine = get_db_engine()
 
     # Utilize Prefect Block to create an engine and ingest the data
     # with database_block.get_connection(begin=False) as engine:
