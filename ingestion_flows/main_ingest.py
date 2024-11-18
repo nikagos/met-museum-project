@@ -6,7 +6,6 @@ from prefect import flow, task
 from prefect_sqlalchemy import SqlAlchemyConnector
 from sqlalchemy.engine import Engine
 from sqlalchemy import text
-from prefect.blocks.core import get_block
 
 
 
@@ -20,7 +19,7 @@ OBJECT_COUNT = 500 # Adjust sample size as needed
 @task(log_prints=True)
 def get_db_engine() -> Engine:
     # Make sure to fetch the engine properly from Prefect's block if you're using that
-    database_block = get_block("metmuseum-postgres-connector")  # Prefect block
+    database_block = SqlAlchemyConnector.load("metmuseum-postgres-connector")
     engine = database_block.get_connection()  # This should return an actual engine object
     return engine
 
