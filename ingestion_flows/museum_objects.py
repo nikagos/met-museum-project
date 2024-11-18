@@ -35,7 +35,7 @@ class MuseumObjects:
             return None
 
 
-    @task(log_prints=True)
+    # @task(log_prints=True) # removed this to not overwhelm terminal logs
     def fetch_object_data(self, obj_id:int):
         """Fetch object data"""
         object_url = f"{self.objects_url}/{obj_id}"
@@ -52,7 +52,7 @@ class MuseumObjects:
             return None  # Handle or log as needed
 
 
-    # @task(log_prints=True)
+    # @task(log_prints=True) # removed this to not overwhelm terminal logs
     def get_object_data(self, object_ids: list) -> list:
         """Get all object data. Use ThreadPoolExecutor to make concurrent requests. For example, if object_ids = [1, 2, 3], executor.map will call:
         fetch_object_data(1)
