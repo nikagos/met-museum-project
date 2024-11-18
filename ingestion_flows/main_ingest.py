@@ -162,6 +162,8 @@ def etl_web_to_postgres() -> None:
     # Fetch the engine using the database connector
     engine = get_db_engine()
 
+    print(f"Engine type: {type(engine)}")
+
     # Utilize Prefect Block to create an engine and ingest the data
     # with database_block.get_connection(begin=False) as engine:
         # Ingest data
