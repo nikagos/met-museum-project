@@ -49,10 +49,15 @@ prefect deployment run 'etl-web-to-postgres/etl-met-museum-web-to-postgres-flow-
 ```
 19:04:18.696 | INFO    | prefect.worker.docker.dockerworker a2212102-69f5-4471-b742-c9229c432d55 - Docker container 'petite-turkey' has status 'exited'
 ```
+ * After this, both tables (`departments` and `objects`) should be built and appear in pgAdmin under Servers > (right-click and Register > Server > (click on new Server name) > Databases > metmuseum > Schemas > public > Tables)
 6. If everything has finished without issues, navigate to the dbt folder of this repo and run:
 ```
 dbt duild
 ```
-  * This will build and run tests against all the new dbt models: `departments_base`,`objects_base`,`object_measurements`, and `constituents`. These should appear under Views in pgAdmin.
-7. 
+  * This will build and run tests against all the new dbt models in the **dev** environment db name `metmuseum`: `departments_base`, `objects_base`, `object_measurements`, and `constituents`. These should appear under Views in pgAdmin.
+7. If you have a production database too, you can also run
+```
+dbt build --target prod
+```
+* This will build and run tests against all the new dbt models in the **prod** environment (db name `metmuseum_prod`): `departments_base`, `objects_base`, `object_measurements`, and `constituents`. These should appear under Views in pgAdmin.
     
