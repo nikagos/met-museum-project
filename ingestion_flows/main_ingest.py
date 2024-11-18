@@ -13,7 +13,7 @@ from sqlalchemy import text
 BASE_URL = "https://collectionapi.metmuseum.org/public/collection/v1/"
 OBJECTS_URL = f"{BASE_URL}objects" # list of all valid objects
 DEPARTMENTS_URL = f"{BASE_URL}departments" # list of all valid departments
-OBJECT_COUNT = 5000 # Adjust sample size as needed
+OBJECT_COUNT = 10000 # Adjust sample size as needed
 
 
 @task(log_prints=True)
@@ -24,7 +24,7 @@ def get_objects(mo: MuseumObjects) -> pd.DataFrame:
     # Sample a smaller subset if necessary
     sample_object_ids = object_ids[:OBJECT_COUNT]
 
-    print("Getting all Object data.")
+    print(f"Getting data for {OBJECT_COUNT} objects.")
     results = mo.get_object_data(sample_object_ids)
     print("Generating Object data df.")
     object_data_df = mo.generate_object_data_df(results)
