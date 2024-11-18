@@ -73,7 +73,7 @@ def truncate_table(table_name: str) -> None:
     truncate_table_query = text(f"TRUNCATE TABLE {table_name};")
 
     database_block = SqlAlchemyConnector.load("metmuseum-postgres-connector")
-    with database_block.connect() as connection:
+    with database_block.get_connection() as connection:
         connection.execute(truncate_table_query)
     print(f"Table {table_name} truncated successfully.")
 
@@ -84,11 +84,11 @@ def ingest_into_postgres(df: pd.DataFrame, table_name: str) -> None:
     
     # Check if table exists before truncating. If it doesn't, create it
     database_block = SqlAlchemyConnector.load("metmuseum-postgres-connector")
-    with database_block.connect() as connection:
-        table_exists = check_if_table_exists(table_name, connection)
+    with database_block.get_connection() as connection:
+        table_exists = check_if_table_exists(table_name)
 
         if table_exists:
-            truncate_table(table_name, connection)
+            truncate_table(table_name)
             df.to_sql(name=table_name, con=connection, if_exists='append', index=False)
             print("Data was ingested.")
         else:
