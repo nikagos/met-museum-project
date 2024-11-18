@@ -62,11 +62,11 @@ def check_if_table_exists(table_name: str, engine: Engine) -> bool:
     # database_block = SqlAlchemyConnector.load("metmuseum-postgres-connector")
 
     # with database_block.get_connection(begin=False) as engine:
-    with engine.begin() as connection:
+    with engine.connect() as connection:
         result = connection.execute(check_table_exists_query).fetchone()
         table_exists = result[0] if result else False
         print(table_exists)
-        
+
     return table_exists
 
 
@@ -76,7 +76,7 @@ def truncate_table(table_name: str, engine: Engine) -> None:
     print(f"Truncating table {table_name}...")
     truncate_table_query = text(f"TRUNCATE TABLE {table_name};")
 
-    with engine.begin() as connection:
+    with engine.connect() as connection:
         connection.execute(truncate_table_query)
     print(f"Table {table_name} truncated successfully.")
 
