@@ -1,11 +1,10 @@
-# import time
+import time
 import requests
 import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
 from prefect import flow, task
 from prefect_sqlalchemy import SqlAlchemyConnector
 from sqlalchemy.engine import Engine
-from sqlalchemy import text
 import json
 
 
@@ -16,7 +15,7 @@ class MuseumObjects:
         self.objects_url = objects_url
 
 
-    # @task(log_prints=True)
+    @task(log_prints=True)
     def get_object_ids(self) -> list:
         """Get all object IDs"""
         response = requests.get(self.objects_url)
@@ -36,6 +35,7 @@ class MuseumObjects:
             return None
 
 
+    @task(log_prints=True)
     def fetch_object_data(self, obj_id:int):
         """Fetch object data"""
         object_url = f"{self.objects_url}/{obj_id}"
@@ -61,18 +61,18 @@ class MuseumObjects:
         almost simultaneously (up to the thread limit set by max_workers), and store their results in results.
         """
         with ThreadPoolExecutor(max_workers=200) as executor: # Adjust max_workers as needed
-            # start_time = time.time()
+            start_time = time.time()
             
             results = list(executor.map(self.fetch_object_data, object_ids)) # Substitute object_ids with sample_object_ids for testing
             
-            # end_time = time.time()
-            # print(f"Extracting data from API took {end_time - start_time:.2f} seconds.")
+            end_time = time.time()
+            print(f"Extracting data from API took {end_time - start_time:.2f} seconds.")
 
         # Filter out any failed requests (None values)
         return [res for res in results if res is not None]
 
 
-    # @task(log_prints=True)
+    @task(log_prints=True)
     def generate_object_data_df(self, results: list) -> pd.DataFrame:
         """# Convert list of dictionaries to DataFrame"""
 

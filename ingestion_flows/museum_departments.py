@@ -14,7 +14,7 @@ class MuseumDepartments:
         self.departments_url = departments_url
 
 
-    # @task(log_prints=True)
+    @task(log_prints=True)
     def fetch_department_data(self) -> list:
         """Fetch object data"""
         print("Inside fetch_department_data function")
@@ -36,7 +36,7 @@ class MuseumDepartments:
             return None
 
 
-    # @task(log_prints=True)
+    @task(log_prints=True)
     def generate_department_data_df(self, results: list) -> pd.DataFrame:
         """# Convert list of dictionaries to DataFrame"""
         print("Inside generate_department_data_df function")
