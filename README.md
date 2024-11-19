@@ -1,10 +1,13 @@
 # The Met Museum data pipeline
 
+
 ## About the Met Museum
 The Metropolitan Museum of Art a.k.a. Met Museum is one of the most popular museums in the world and is based in New York City. They offer an [API](https://metmuseum.github.io/) endpoint that people can use to access and explore their museum exhibition data digitally.
 
+
 ## Purpose of the project
-In the context of the [Data Engineering Zoomcamp](https://datatalks.club/), which teaches all about building pipelines, I decided to put this knowledge into practice and implement this pipeline. Note that we are skipping the visualization part of the data lifecycle, as we want to purely focus on the ELT part and not the consumption.
+In the context of the [Data Engineering Zoomcamp](https://datatalks.club/), which teaches how to build pipelines, I decided to put this knowledge into practice and implement this pipeline. Note that I am skipping the visualization part of the data lifecycle, as I want to purely focus on the ELT part and not the consumption.
+
 
 ## Pipeline architecture
 The pipeline utilizes a wide range of tools that are nowadays part of the modern data engineering stack. More specifically:
@@ -18,17 +21,17 @@ The pipeline utilizes a wide range of tools that are nowadays part of the modern
 
 <img src="https://github.com/nikagos/met-museum-project/blob/master/images/pipeline_architecture.png" width="1000">
 
-Note that we built a virtual machine in GCP because they provide 90-day/$300 credit to access their tools.
+Note that I built a virtual machine in GCP because they provide 90-day/$300 credit to access their tools.
+
 
 ## Setting up the environment
-All the tools in the diagram above need to be installed on your machine. This can be complex and time-consuming to outline here, so I strongly encourage you to watch the following videos. For dbt specifically, we've described the detailed steps below, but there are plenty of resources on the dbt website and online to accomplish this
-1. Terraform: [Video 1](https://www.youtube.com/watch?v=s2bOYDCKl_M&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=13), [Video 2](https://www.youtube.com/watch?v=Y2ux7gq3Z0o&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=13), [Video 3](https://www.youtube.com/watch?v=PBi0hHjLftk&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=15)
-2. Docker
-3. Postgres
-4. pgAdmin
-5. Docker Compose
-6. Prefect
-7. dbt
+All the tools in the diagram above need to be installed on your machine. This can be complex and time-consuming to outline in detail here, so I strongly encourage you to watch the following videos. For dbt specifically, I've described the detailed steps below, but there are plenty of resources on the dbt website and online to accomplish this
+1. Python 3.9 (Anaconda distribution) [Video](https://www.youtube.com/watch?v=ae-CV2KfoN0&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=15)
+2. Terraform: [Video 1](https://www.youtube.com/watch?v=s2bOYDCKl_M&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=13), [Video 2](https://www.youtube.com/watch?v=Y2ux7gq3Z0o&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=13), [Video 3](https://www.youtube.com/watch?v=PBi0hHjLftk&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=15)
+3. Docker and Docker Compose [Video](https://www.youtube.com/watch?v=ae-CV2KfoN0&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=16)
+4. Postgres and pgAdmin [Video 1](https://www.youtube.com/watch?v=2JM-ziJt0WI&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=6), [Video 2](https://www.youtube.com/watch?v=hCAIVe9N0ow&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=8), [Video 3](https://www.youtube.com/watch?v=hKI6PkPhpa0&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=9)
+5. Prefect [Video 1](https://www.youtube.com/watch?v=cdtN6dhp708&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb), [Video 2](https://www.youtube.com/watch?v=cdtN6dhp708&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb)
+6. dbt
   * Confirm that you have the right Python version installed (3.7 or higher)
 ```
 python --version
@@ -69,7 +72,7 @@ met_museum_dbt_project:
       user: root
   target: dev
 ```
-Notice that we have a **dev** and a **prod** profile.
+Notice that we have a **dev** and a **prod** profile. Also, make sure you change the host and password accordingly. 
 
 After completing these steps, your dbt environment is set up and you can use the assets of this repo to create your dbt models too.
 
@@ -79,7 +82,11 @@ After completing these steps, your dbt environment is set up and you can use the
   * Note that we used the option SyncDriver > "postgresql+psycopg2"
 2. Prefect Server is running (run command `prefect server start`)
 3. Docker-compose is running (run command `docker-compose up --build` or `docker-compose up -d`)
-4. Ports 5432 (Postgres), 8080 (pgAdmin), 4200 (Prefect) have been forwarded. I use VS Code for this and the Ports > Forward option available.
+4. Ports 5432 (Postgres), 8080 (pgAdmin), 4200 (Prefect) have been forwarded. I use VS Code for this and the Ports > Forward option
+5. Confirm that in your browser you can access:
+  * Prefect: http://localhost:4200/
+  * pgAdmin: http://localhost:8080/
+
 
 ## Run the pipeline
 1. Open up your terminal and clone the repo locally
