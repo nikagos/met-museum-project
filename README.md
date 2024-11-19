@@ -18,9 +18,63 @@ The pipeline utilizes a wide range of tools that are nowadays part of the modern
 
 <img src="https://github.com/nikagos/met-museum-project/blob/master/images/pipeline_architecture.png" width="1000">
 
-## Setting up the environment
+Note that we built a virtual machine in GCP because they provide 90-day/$300 credit to access their tools.
 
-## Prerequisites to run the pipeline
+## Setting up the environment
+All the tools in the diagram above need to be installed on your machine. This can be complex and time-consuming to outline here, so I strongly encourage you to watch the following videos. For dbt specifically, we've described the detailed steps below, but there are plenty of resources on the dbt website and online to accomplish this
+1. Terraform: [Video 1](https://www.youtube.com/watch?v=s2bOYDCKl_M&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=13), [Video 2](https://www.youtube.com/watch?v=Y2ux7gq3Z0o&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=13), [Video 3](https://www.youtube.com/watch?v=PBi0hHjLftk&list=PL3MmuxUbc_hJed7dXYoJw8DoCuVHhGEQb&index=15)
+2. Docker
+3. Postgres
+4. pgAdmin
+5. Docker Compose
+6. Prefect
+7. dbt
+  * Confirm that you have the right Python version installed (3.7 or higher)
+```
+python --version
+```
+or
+```
+python3 --version
+``` 
+  * Install `dbt-core`. Also, because we are using Postgres, we need to install the `dbt-postgres` connector too along with dbt-core. In your terminal run:
+```
+python -m pip install dbt-core dbt-postgres
+```
+  * Install dbt dependencies:
+```
+dbt deps
+```
+  * Configure Your dbt Profile. dbt requires a `profiles.yml` file to connect to your database. This file is typically located in the `~/.dbt/` directory. Create or edit the `profiles.yml` file such as:
+```
+met_museum_dbt_project:
+  outputs:
+    dev:
+      dbname: metmuseum
+      host: localhost
+      pass: root
+      port: 5432
+      schema: public
+      threads: 1
+      type: postgres
+      user: root
+    prod:
+      dbname: metmuseum_prod
+      host: localhost
+      pass: root
+      port: 5432
+      schema: public
+      threads: 1
+      type: postgres
+      user: root
+  target: dev
+```
+Notice that we have a **dev** and a **prod** profile.
+
+After completing these steps, your dbt environment is set up and you can use the assets of this repo to create your dbt models too.
+
+
+## Before you run the pipeline
 1. Postgres credentials need to be stored in a Prefect Block (Prefect > Blocks > Create > Select "SQLAlchemy Connector")
   * Note that we used the option SyncDriver > "postgresql+psycopg2"
 2. Prefect Server is running (run command `prefect server start`)
@@ -55,7 +109,7 @@ prefect deployment run 'etl-web-to-postgres/etl-met-museum-web-to-postgres-flow-
 dbt duild
 ```
   * This will build and run tests against all the new dbt models in the **dev** environment db name `metmuseum`: `departments_base`, `objects_base`, `object_measurements`, and `constituents`. These should appear under Views in pgAdmin.
-7. If you have a production database too, you can also run
+7. If you have a production database too (i.e. a copy of the dev database `metmuseum`), you can also run
 ```
 dbt build --target prod
 ```
